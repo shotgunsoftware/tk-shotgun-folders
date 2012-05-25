@@ -6,7 +6,7 @@ App that creates folders on disk from inside of Shotgun.
 
 """
 
-from tank.system import Application
+from tank.platform import Application
 import tank
 
 class CreateFolders(Application):
