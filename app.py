@@ -53,10 +53,7 @@ class CreateFolders(Application):
     def create_folders(self, entity_type, entity_ids):
         entities_processed = 0
         try:
-            entities_processed = tank.create_filesystem_structure(self.engine.shotgun, 
-                                                                  self.engine.context.project_root,
-                                                                  entity_type, 
-                                                                  entity_ids)
+            entities_processed = self.tank.create_filesystem_structure(entity_type, entity_ids)
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
             self.engine.log_error(tank_error)
