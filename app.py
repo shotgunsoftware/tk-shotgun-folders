@@ -56,35 +56,35 @@ class CreateFolders(Application):
             entities_processed = self.tank.create_filesystem_structure(entity_type, entity_ids)
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
-            self.engine.log_error(tank_error)
+            self.log_error(tank_error)
 
         except Exception as error:
             # other errors are not expected and probably bugs - here it's useful with a callstack.
-            self.engine.log_exception("Error when creating folders!")
+            self.log_exception("Error when creating folders!")
         
         # report back to user
         if entities_processed < 2: # project always processed
             if entity_type == "Task":
-                self.engine.log_info("No folders processed!")
+                self.log_info("No folders processed!")
                 
             else:
-                self.engine.log_info("No folders processed - there is no folder configuration "
-                                     "for %s entities!" % entity_type)
+                self.log_info("No folders processed - there is no folder configuration "
+                            "for %s entities!" % entity_type)
         
         else:
             if entity_type == "Task":
-                self.engine.log_info("%d %s processed - "
-                                     "Processed a total of %d Entities, "
-                                     "Steps and Tasks." % (len(entity_ids), 
-                                                           self._add_plural(entity_type, len(entity_ids)), 
-                                                           entities_processed))            
+                self.log_info("%d %s processed - "
+                             "Processed a total of %d Entities, "
+                             "Steps and Tasks." % (len(entity_ids), 
+                                                   self._add_plural(entity_type, len(entity_ids)), 
+                                                   entities_processed))            
             else:
-                self.engine.log_info("%d %s processed - "
-                                     "Processed a total of %d %s, "
-                                     "Steps and Tasks." % (len(entity_ids), 
-                                                           self._add_plural(entity_type, len(entity_ids)), 
-                                                           entities_processed, 
-                                                           self._add_plural(entity_type, 2)))
+                self.log_info("%d %s processed - "
+                             "Processed a total of %d %s, "
+                             "Steps and Tasks." % (len(entity_ids), 
+                                                   self._add_plural(entity_type, len(entity_ids)), 
+                                                   entities_processed, 
+                                                   self._add_plural(entity_type, 2)))
         
     
         
