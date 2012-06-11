@@ -40,6 +40,17 @@ class CreateFolders(Application):
         }
         
         self.engine.register_command("create_folders", self.create_folders, p)
+
+        p = {
+            "title": "Preview Create Folders",
+            "entity_types": entity_types,
+            "deny_permissions": deny_permissions,
+            "deny_platforms": deny_platforms,
+            "supports_multiple_selection": True
+        }
+        
+        self.engine.register_command("preview_folders", self.preview_create_folders, p)
+
     
     def _add_plural(self, word, items):
         """
@@ -49,6 +60,24 @@ class CreateFolders(Application):
             return "%ss" % word
         else:
             return word
+
+    def preview_create_folders(self, entity_type, entity_ids):
+        paths = []
+        try:
+            paths = self.tank.preview_filesystem_structure(entity_type, entity_ids)
+        except tank.TankError, tank_error:
+            # tank errors are errors that are expected and intended for the user
+            self.log_error(tank_error)
+        except Exception as error:
+            # other errors are not expected and probably bugs - here it's useful with a callstack.
+            self.log_exception("Error when previewing folders!")
+        
+        # report back to user
+        self.log_info("<b>Creating folders would generate %d items on disk:</b>" % len(paths))
+        self.log_info("")
+        for p in paths:
+            self.log_info(p)
+                
 
     def create_folders(self, entity_type, entity_ids):
         entities_processed = 0
