@@ -68,7 +68,7 @@ class CreateFolders(Application):
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
-        except Exception as error:
+        except Exception, error:
             # other errors are not expected and probably bugs - here it's useful with a callstack.
             self.log_exception("Error when previewing folders!")
         
@@ -87,7 +87,7 @@ class CreateFolders(Application):
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
 
-        except Exception as error:
+        except Exception, error:
             # other errors are not expected and probably bugs - here it's useful with a callstack.
             self.log_exception("Error when creating folders!")
         
