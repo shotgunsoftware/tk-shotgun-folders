@@ -16,21 +16,7 @@ class CreateFolders(Application):
         entity_types = list(self.get_setting("entity_types"))
         deny_permissions = self.get_setting("deny_permissions")
         deny_platforms = self.get_setting("deny_platforms")
-        
-        if "Task" in entity_types:
-            task_idx = entity_types.index("Task")
-            del entity_types[task_idx]
-            
-            p = {
-                "title": "Create Folders for Associated Entity",
-                "entity_types": ["Task"],
-                "deny_permissions": deny_permissions,
-                "deny_platforms": deny_platforms,
-                "supports_multiple_selection": True
-            }
-
-            self.engine.register_command("task_create_folders", self.create_folders, p)
-        
+                
         p = {
             "title": "Create Folders",
             "entity_types": entity_types,
@@ -62,9 +48,26 @@ class CreateFolders(Application):
             return word
 
     def preview_create_folders(self, entity_type, entity_ids):
+        
+        if len(entity_ids) == 0:
+            self.log_info("No entities specified!")
+            return
+        
+        #################################################################################
+        #
+        # Add the project (assume all entities belong to the same project)
+        # the reason we need the project is to make sure that any static child folders
+        # on the project level are properly created. This is because you run actions 
+        # from the shotgun project entities.
+        #
+        if entity_type != "Project":
+            data = self.shotgun.find_one(entity_type, [["id", "is", entity_ids[0]]], ["project"])
+            project_id = data["project"]["id"]
+        
         paths = []
         try:
-            paths = self.tank.preview_filesystem_structure(entity_type, entity_ids)
+            paths.extend( self.tank.preview_filesystem_structure("Project", [project_id]) )
+            paths.extend( self.tank.preview_filesystem_structure(entity_type, entity_ids) )
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
@@ -73,16 +76,38 @@ class CreateFolders(Application):
             self.log_exception("Error when previewing folders!")
         
         # report back to user
-        self.log_info("<b>Creating folders would generate %d items on disk:</b>" % len(paths))
-        self.log_info("")
-        for p in paths:
-            self.log_info(p)
+        if len(paths) == 0:
+            self.log_info("<b>No folders would be generated on disk for this item!</b>")
+
+        else:
+            self.log_info("<b>Creating folders would generate %d items on disk:</b>" % len(paths))
+            self.log_info("")
+            for p in paths:
+                self.log_info(p)
                 
 
     def create_folders(self, entity_type, entity_ids):
+        
+        if len(entity_ids) == 0:
+            self.log_info("No entities specified!")
+            return
+        
         entities_processed = 0
+        
+        #################################################################################
+        #
+        # Add the project (assume all entities belong to the same project)
+        # the reason we need the project is to make sure that any static child folders
+        # on the project level are properly created. This is because you run actions 
+        # from the shotgun project entities.
+        #
+        if entity_type != "Project":
+            data = self.shotgun.find_one(entity_type, [["id", "is", entity_ids[0]]], ["project"])
+            project_id = data["project"]["id"]
+        
         try:
-            entities_processed = self.tank.create_filesystem_structure(entity_type, entity_ids)
+            entities_processed  = self.tank.create_filesystem_structure("Project", [project_id])
+            entities_processed += self.tank.create_filesystem_structure(entity_type, entity_ids)
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
@@ -92,28 +117,10 @@ class CreateFolders(Application):
             self.log_exception("Error when creating folders!")
         
         # report back to user
-        if entities_processed < 2: # project always processed
-            if entity_type == "Task":
-                self.log_info("No folders processed!")
-                
-            else:
-                self.log_info("No folders processed - there is no folder configuration "
-                            "for %s entities!" % entity_type)
-        
-        else:
-            if entity_type == "Task":
-                self.log_info("%d %s processed - "
-                             "Processed a total of %d Entities, "
-                             "Steps and Tasks." % (len(entity_ids), 
-                                                   self._add_plural(entity_type, len(entity_ids)), 
-                                                   entities_processed))            
-            else:
-                self.log_info("%d %s processed - "
-                             "Processed a total of %d %s, "
-                             "Steps and Tasks." % (len(entity_ids), 
-                                                   self._add_plural(entity_type, len(entity_ids)), 
-                                                   entities_processed, 
-                                                   self._add_plural(entity_type, 2)))
+        self.log_info("%d %s processed - "
+                     "Processed %d folders on disk." % (len(entity_ids), 
+                                                        self._add_plural(entity_type, len(entity_ids)), 
+                                                        entities_processed))            
         
     
         
