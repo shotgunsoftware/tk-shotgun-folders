@@ -93,21 +93,8 @@ class CreateFolders(Application):
             return
         
         entities_processed = 0
-        
-        #################################################################################
-        #
-        # Add the project (assume all entities belong to the same project)
-        # the reason we need the project is to make sure that any static child folders
-        # on the project level are properly created. This is because you run actions 
-        # from the shotgun project entities.
-        #
-        if entity_type != "Project":
-            data = self.shotgun.find_one(entity_type, [["id", "is", entity_ids[0]]], ["project"])
-            project_id = data["project"]["id"]
-        
         try:
-            entities_processed  = self.tank.create_filesystem_structure("Project", [project_id])
-            entities_processed += self.tank.create_filesystem_structure(entity_type, entity_ids)
+            entities_processed = self.tank.create_filesystem_structure(entity_type, entity_ids)
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
