@@ -66,7 +66,6 @@ class CreateFolders(Application):
         
         paths = []
         try:
-            paths.extend( self.tank.preview_filesystem_structure("Project", [project_id]) )
             paths.extend( self.tank.preview_filesystem_structure(entity_type, entity_ids) )
         except tank.TankError, tank_error:
             # tank errors are errors that are expected and intended for the user
