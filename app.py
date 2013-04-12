@@ -83,6 +83,8 @@ class CreateFolders(Application):
             self.log_info("")
             for p in paths:
                 self.log_info(p)
+            self.log_info("")
+            self.log_info("Note that some of these folders may exist on disk already.")
                 
 
     def create_folders(self, entity_type, entity_ids):
