@@ -1,4 +1,4 @@
 tk-shotgun-folders
 ==================
 
-Tank Shotgun Folder creation
+Sgtk Shotgun Folder creation
