@@ -72,10 +72,10 @@ class CreateFolders(Application):
         else:            
             # success! report back to user
             if len(paths) == 0:
-                self.log_info("<b>No folders would be generated on disk for this item!</b>")
+                self.log_info("*No folders would be generated on disk for this item!*")
     
             else:
-                self.log_info("<b>Creating folders would generate %d items on disk:</b>" % len(paths))
+                self.log_info("*Creating folders would generate %d items on disk:*" % len(paths))
                 self.log_info("")
                 for p in paths:
                     self.log_info(p)
