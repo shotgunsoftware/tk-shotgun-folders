@@ -41,6 +41,15 @@ class CreateFolders(Application):
         
         self.engine.register_command("preview_folders", self.preview_create_folders, p)
 
+        p = {
+            "title": "Unregister Folders",
+            "deny_permissions": deny_permissions,
+            "deny_platforms": deny_platforms,
+            "supports_multiple_selection": True
+        }
+        
+        self.engine.register_command("unregister_folders", self.unregister_folders, p)
+
     
     def _add_plural(self, word, items):
         """
@@ -107,7 +116,35 @@ class CreateFolders(Application):
                          "Processed %d folders on disk." % (len(entity_ids), 
                                                             self._add_plural(entity_type, len(entity_ids)), 
                                                             entities_processed))            
-        
+
+    def unregister_folders(self, entity_type, entity_ids):
+
+        if len(entity_ids) == 0:
+            self.log_info("No entities specified!")
+            return
+
+        try:
+
+            uf = self.tank.get_command("unregister_folders")
+
+            message = []
+            for entity_id in entity_ids:
+                result = uf.execute({"entity": {"type": entity_type, "id": entity_id}})
+                message.append(result)
+
+        except tank.TankError, tank_error:
+            # tank errors are errors that are expected and intended for the user
+            self.log_error(tank_error)
+
+        except Exception, error:
+            # other errors are not expected and probably bugs - here it's useful with a callstack.
+            self.log_exception("Error when unregiering folders: %s" % error)
+
+        else:
+            # report back to user
+            self.log_info("Unregistered Folders: %s" % message)
+
+
     
         
         
