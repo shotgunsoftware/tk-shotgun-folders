@@ -61,11 +61,11 @@ class CreateFolders(Application):
         try:
             paths.extend( self.tank.preview_filesystem_structure(entity_type, entity_ids) )
         
-        except tank.TankError, tank_error:
+        except tank.TankError as tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
         
-        except Exception, error:
+        except Exception as error:
             # other errors are not expected and probably bugs - here it's useful with a callstack.
             self.log_exception("Error when previewing folders!")
         
@@ -93,11 +93,11 @@ class CreateFolders(Application):
         try:
             entities_processed = self.tank.create_filesystem_structure(entity_type, entity_ids)
             
-        except tank.TankError, tank_error:
+        except tank.TankError as tank_error:
             # tank errors are errors that are expected and intended for the user
             self.log_error(tank_error)
 
-        except Exception, error:
+        except Exception as error:
             # other errors are not expected and probably bugs - here it's useful with a callstack.
             self.log_exception("Error when creating folders!")
         
